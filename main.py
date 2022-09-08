@@ -2,16 +2,18 @@ import requests
 import datetime
 from twilio.rest import Client
 
-STOCK_NAME = "TSLA"
-COMPANY_NAME = "tesla"
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
-STOCK_KEY = "JAQE3711NMRDGSZ0"
-NEWS_KEY = "73e578b61013435695c39c8fe69cef04"
-SMS_SID = "ACa0989588c68a49c8a2751da99be3c2b1"
-SMS_TOKEN = "5f60f7bd753f783480ac00129cb173a6"
-SMS_SENDER = "+19594568893"
-SMS_RECEIVER = "+918408849900"
+
+#Put your values here
+STOCK_NAME = 
+COMPANY_NAME = 
+STOCK_KEY = 
+NEWS_KEY = 
+SMS_SID = 
+SMS_TOKEN = 
+SMS_SENDER = 
+SMS_RECEIVER = 
 YESTERDAY = datetime.date.today() - datetime.timedelta(days=1)
 DAYBFRYES = datetime.date.today() - datetime.timedelta(days=2)
 
@@ -22,12 +24,13 @@ data1 = req1.json()
 close1 = float(data1["Time Series (Daily)"][f"{YESTERDAY}"]["4. close"])
 close2 = float(data1["Time Series (Daily)"][f"{DAYBFRYES}"]["4. close"])
 diff = round(close1 - close2, 2)
-
+print(diff)
 if diff<0:
     arrow="down"
 else:
     arrow="up"
 percent_diff = round((abs(diff) / close1) * 100, 2)
+print(percent_diff)
 if percent_diff > 5:
     news_url = f"https://newsapi.org/v2/top-headlines?q={COMPANY_NAME}&apiKey={NEWS_KEY}"
     req2 = requests.get(news_url)
@@ -38,13 +41,15 @@ if percent_diff > 5:
     client = Client(SMS_SID,SMS_TOKEN)
 
     for i in (news):
-        if arrow=="up":
+        if arrow=="down":
             message = message = client.messages.create(
-                    body=f"{STOCK_NAME}: 🔻 {percent_diff} %\nHeadline: {i[0]}\nDescription: {i[1]}", from_="+19594568893", to="+918408849900"
+                    body=f"{STOCK_NAME}: 🔻 {percent_diff} %\nHeadline: {i[0]}\nDescription: {i[1]}", from_=SMS_SENDER, to=SMS_RECEIVER
                 )
+            print(message.sid)
         else:
             message = message = client.messages.create(
-                    body=f"{STOCK_NAME}: 🔺 {percent_diff} %\nHeadline: {i[0]}\nDescription: {i[1]}", from_="+19594568893", to="+918408849900"
+                    body=f"{STOCK_NAME}: 🔺 {percent_diff} %\nHeadline: {i[0]}\nDescription: {i[1]}", from_=SMS_SENDER, to=SMS_RECEIVER
                 )
+            print(message.sid)
 
 
